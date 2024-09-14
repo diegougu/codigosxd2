@@ -15,7 +15,6 @@ struct DESC {
 	}
 };
 
-
 template <class T>
 struct node {
 	T data;
@@ -27,7 +26,7 @@ template <class T, class C>
 class LinkedList {
 private:
 	node<T>* head = nullptr;
-	bool find(T v, node<T>*& pos);
+	bool find(node<T>*& pos, T v);
 public:
 	void add(T v);
 	void del(T v);
@@ -35,13 +34,26 @@ public:
 };
 
 template <class T, class C>
-bool LinkedList<T, C>::find(T v, node<T>*& pos) {
+bool LinkedList<T, C>::find(node<T>*& pos, T v) {
+	node<T>* p = head;
 	C comp;
-	while (comp(v, pos->data) && pos->next != nullptr) {
+	while (pos->next != nullptr && comp(v, pos->data)) {
+		p = pos;
 		pos = pos->next;
 	}
-	return pos->data == v && pos != nullptr;
+
+	if (pos->data == v) {
+		pos = p;
+		return true;
+	}
+	else {
+		pos = p;
+		return false;
+	}
 }
+
+
+
 
 template <class T, class C>
 void LinkedList<T, C>::add(T v) {
@@ -50,28 +62,24 @@ void LinkedList<T, C>::add(T v) {
 		node<T>* temp = new node<T>(v);
 		head = temp;
 	}
-	else if (!comp(v, head->data) && v != head->data) {
+	else if (v != head->data && !comp(v, head->data)) {
 		node<T>* temp = new node<T>(v);
 		temp->next = head;
 		head = temp;
 	}
 	else {
 		node<T>* pos = head;
-		if (find(v, pos)) {
+		if (find(pos, v)) {
 			return;
 		}
 		node<T>* temp = new node<T>(v);
-		node<T>* q = head;
-		while (q->next != pos && q->next != nullptr) {
-			q = q->next;
-		}
-
-		if (comp(v, pos->data) && pos->next == nullptr) {
-			pos->next = temp;
+		node<T>* p = pos->next;
+		if (p != nullptr && p->next == nullptr && comp(v, p->data)) {
+			p->next = temp;
 		}
 		else {
-			q->next = temp;
-			temp->next = pos;
+			temp->next = p;
+			pos->next = temp;
 		}
 	}
 }
@@ -81,31 +89,26 @@ void LinkedList<T, C>::del(T v) {
 	if (head == nullptr) {
 		return;
 	}
-	else if (v == head->data && head->next != nullptr) {
+	else if (head->data == v && head->next != nullptr) {
 		node<T>* temp = head;
 		head = head->next;
 		delete temp;
 	}
-	else if (v == head->data && head->next == nullptr){
+	else if (head->data == v && head->next == nullptr) {
 		node<T>* temp = head;
 		head = nullptr;
 		delete temp;
 	}
 	else {
-		node<T>* temp = head;
-		if (!find(v, temp)) {
+		node<T>* pos = head;
+		if (!find(pos, v)) {
 			return;
 		}
-		node<T>* q = head;
-		while (q->next != temp) {
-			q = q->next;
-		}
-
-		q->next = temp->next;
+		node<T>* temp = pos->next;
+		pos->next = temp->next;
 		delete temp;
 	}
 }
-
 
 template <class T, class C>
 void LinkedList<T, C>::print() {
@@ -114,7 +117,6 @@ void LinkedList<T, C>::print() {
 	}
 	cout << endl;
 }
-
 
 int main() {
 	cout << "Lista de enteros (DESC):" << endl;
@@ -128,30 +130,6 @@ int main() {
 	listaIntDesc.add(2);
 	listaIntDesc.add(4);
 	listaIntDesc.print();
-
-	cout << "Lista de enteros (ASC):" << endl;
-	LinkedList<int, ASC<int>> listaIntAsc;
-	listaIntAsc.add(3);
-	listaIntAsc.add(1);
-	listaIntAsc.add(7);
-	listaIntAsc.add(4);
-	listaIntAsc.add(6);
-	listaIntAsc.add(5);
-	listaIntAsc.add(2);
-	listaIntAsc.add(4);
-	listaIntAsc.print();
-
-	cout << "Lista de caracteres (DESC):" << endl;
-	LinkedList<char, DESC<char>> listaCharDesc;
-	listaCharDesc.add('d');
-	listaCharDesc.add('a');
-	listaCharDesc.add('f');
-	listaCharDesc.add('b');
-	listaCharDesc.add('e');
-	listaCharDesc.add('c');
-	listaCharDesc.add('g');
-	listaCharDesc.print();
-
 	cout << "Lista de caracteres (ASC):" << endl;
 	LinkedList<char, ASC<char>> listaCharAsc;
 	listaCharAsc.add('d');
@@ -161,5 +139,19 @@ int main() {
 	listaCharAsc.add('e');
 	listaCharAsc.add('c');
 	listaCharAsc.add('g');
+	listaCharAsc.print();
+
+	cout << "Lista de enteros (DESC): Borrado" << endl;
+	listaIntDesc.del(1);
+	listaIntDesc.del(7);
+	listaIntDesc.del(5);
+	listaIntDesc.del(3);
+	listaIntDesc.print();
+
+	cout << "Lista de caracteres (ASC): Borrado" << endl;
+	listaCharAsc.del('d');
+	listaCharAsc.del('b');
+	listaCharAsc.del('a');
+	listaCharAsc.del('g');
 	listaCharAsc.print();
 }
