@@ -197,12 +197,16 @@ void Deque::print() {
 
 int& Deque::operator[](int v) {
 	if (v > elementos) {
-		int dirreccion_random = 0;
-		return dirreccion_random;
+		int random = 0;
+		return random;
 	}
-	int vacios = (*inicio_mapa - inicio_arr) + (fin_arr - *fin_mapa + map_tam - 1);
-	int pos = v % arr_tam;
+	int espacios_vacios = inicio_arr - *inicio_mapa;
+	int pos_mapa = v / 5;
+	int pos_arr = (v % 5) + espacios_vacios;
 
+	int** m_pos = inicio_mapa + pos_mapa;
+	int* a_pos = *m_pos + pos_arr;
+	return *a_pos;
 }
 
 
@@ -233,5 +237,24 @@ int main() {
 	d.print();
 	d.pop_front();
 	d.print();
+
+	
+	Deque d2(8, 5);
+	d2.push_front(9);
+	d2.push_front(7);
+	d2.push_front(4);
+	d2.push_front(1);
+	d2.push_front(3);
+	d2.push_front(8);
+	d2.push_back(6);
+	d2.push_back(5);
+	d2.push_back(2);
+	d2.push_back(7);
+
+	d2.print();
+	int valor = d2[7];
+	cout << valor;
+
+
 }
 
