@@ -13,7 +13,7 @@ class LinkedArray {
 private:
 	arrnode<T>* head = nullptr;
 	arrnode<T>* tail = nullptr;
-	void find(arrnode<T>*& pos, T*& pos_arr, T v);
+	bool find(arrnode<T>*& pos, T*& pos_arr, T v);
 public:
 	void add(T v);
 	void del(T v);
@@ -23,16 +23,13 @@ public:
 
 
 template <class T>
-void LinkedArray<T>::find(arrnode<T>*& pos, T*& pos_arr, T v) {
+bool LinkedArray<T>::find(arrnode<T>*& pos, T*& pos_arr, T v) {
 	while (pos != nullptr) {
 		while (pos_arr <= pos->top) {
 			if (*pos_arr >= v) {
-				break;
+				return true;
 			}
 			pos_arr++;
-		}
-		if (*pos_arr >= v) {
-			break;
 		}
 		pos = pos->next;
 		if (pos != nullptr) {
@@ -64,36 +61,37 @@ void LinkedArray<T>::add(T v) {
 		arrnode<T>* pos = head;
 		T* pos_arr = pos->arr;
 
-		find(pos, pos_arr, v);
+		if (find(pos, pos_arr, v)) {
+			T temp1 = *pos_arr;
+			*pos_arr = v;
+			T temp2 = temp1;
+			*pos_arr++;
 
-		T temp1 = *pos_arr;
-		*pos_arr = v;
-		T temp2 = temp1;
-		*pos_arr++;
+			while (pos != nullptr) {
+				while (pos_arr <= pos->top) {
+					temp2 = *pos_arr;
+					*pos_arr = temp1;
+					temp1 = temp2;
+					pos_arr++;
+				}
 
-		while (pos != nullptr) {
-			while (pos_arr <= pos->top) {
-				temp2 = *pos_arr;
-				*pos_arr = temp1;
-				temp1 = temp2;
-				pos_arr++;
+				pos = pos->next;
+				if (pos != nullptr) {
+					pos_arr = pos->arr;
+				}
 			}
-
-			pos = pos->next;
-			if (pos != nullptr) {
-				pos_arr = pos->arr;
+			if (tail->top != tail->arr + 4) {
+				tail->top++;
+				*tail->top = temp1;
+			}
+			else {
+				arrnode<T>* temp = new arrnode<T>;
+				tail->next = temp;
+				tail = tail->next;
+				*tail->top = temp1;
 			}
 		}
-		if (tail->top != tail->arr + 4) {
-			tail->top++;
-			*tail->top = temp1;
-		}
-		else {
-			arrnode<T>* temp = new arrnode<T>;
-			tail->next = temp;
-			tail = tail->next;
-			*tail->top = temp1;
-		}
+
 	}
 }
 
@@ -119,43 +117,42 @@ void LinkedArray<T>::del(T v) {
 	else {
 		arrnode<T>* pos = head;
 		T* pos_arr = pos->arr;
-		find(pos, pos_arr, v);
-
-		while (pos != nullptr) {
-			while (pos_arr <= pos->top) {
-				if (pos_arr != pos->top) {
-					*pos_arr = *(pos_arr + 1);
+		if (find(pos, pos_arr, v)) {
+			while (pos != nullptr) {
+				while (pos_arr <= pos->top) {
+					if (pos_arr != pos->top) {
+						*pos_arr = *(pos_arr + 1);
+					}
+					else if (pos_arr == pos->top && pos->next != nullptr) {
+						T* pos_next_arr = pos->next->arr;
+						*pos_arr = *pos_next_arr;
+					}
+					pos_arr++;
 				}
-				else if (pos_arr == pos->top && pos->next != nullptr) {
-					T* pos_next_arr = pos->next->arr;
-					*pos_arr = *pos_next_arr;
+				pos = pos->next;
+				if (pos != nullptr) {
+					pos_arr = pos->arr;
 				}
-				pos_arr++;
-			}
-			pos = pos->next;
-			if (pos != nullptr) {
-				pos_arr = pos->arr;
-			}
 
-		}
-		if (tail->top != tail->arr) {
-			tail->top--;
-		}
-		else if(tail->top == tail->arr) {
-			arrnode<T>* temp = tail;
-			arrnode<T>* p = head;
-			while (p->next != tail) {
-				p = p->next;
 			}
-			tail = p;
-			tail->next = nullptr;
-			delete temp;
+			if (tail->top != tail->arr) {
+				tail->top--;
+			}
+			else if (tail->top == tail->arr) {
+				arrnode<T>* temp = tail;
+				arrnode<T>* p = head;
+				while (p->next != tail) {
+					p = p->next;
+				}
+				tail = p;
+				tail->next = nullptr;
+				delete temp;
+			}
 		}
+
+		
 	}
 }
-
-
-
 
 template <class T>
 void LinkedArray<T>::print() {
@@ -176,8 +173,8 @@ int main() {
 
 	for (int i = 0; i < 13; i++) {
 		l1.add(arr[i]);
-		l1.print();
 	}
+	l1.print();
 
 	for (int i = 0; i < 5; i++) {
 		l1.del(del_arr[i]);
@@ -187,4 +184,3 @@ int main() {
 
 
 }
-
