@@ -20,8 +20,6 @@ public:
 	void print();
 };
 
-
-
 template <class T>
 bool LinkedArray<T>::find(arrnode<T>*& pos, T*& pos_arr, T v) {
 	while (pos != nullptr) {
@@ -36,6 +34,7 @@ bool LinkedArray<T>::find(arrnode<T>*& pos, T*& pos_arr, T v) {
 			pos_arr = pos->arr;
 		}
 	}
+	return false;
 }
 
 
@@ -150,7 +149,7 @@ void LinkedArray<T>::del(T v) {
 			}
 		}
 
-		
+
 	}
 }
 
@@ -180,7 +179,4 @@ int main() {
 		l1.del(del_arr[i]);
 		l1.print();
 	}
-
-
-
 }
