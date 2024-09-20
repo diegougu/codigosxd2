@@ -116,7 +116,7 @@ void LinkedArray<T>::del(T v) {
 	else {
 		arrnode<T>* pos = head;
 		T* pos_arr = pos->arr;
-		if (find(pos, pos_arr, v)) {
+		if (find(pos, pos_arr, v) && *pos_arr == v) {
 			while (pos != nullptr) {
 				while (pos_arr <= pos->top) {
 					if (pos_arr != pos->top) {
@@ -179,4 +179,7 @@ int main() {
 		l1.del(del_arr[i]);
 		l1.print();
 	}
+
+	l1.del(1);
+	l1.print();
 }
