@@ -62,7 +62,7 @@ void LinkedArray<T, C>::add(T v) {
 		tail = temp;
 		*tail->top = v;
 	}
-	else if (comp(v,*tail->top) && tail->top != tail->arr + 4) {
+	else if (comp(v, *tail->top) && tail->top != tail->arr + 4) {
 		tail->top++;
 		*tail->top = v;
 	}
@@ -170,7 +170,7 @@ void LinkedArray<T, C>::del(T v) {
 }
 
 template <class T, class C>
-void LinkedArray<T,C>::print() {
+void LinkedArray<T, C>::print() {
 	for (arrnode<T>* p = head; p; p = p->next) {
 		cout << "[ ";
 		for (T* q = p->arr; q <= p->top; q++) {
@@ -182,7 +182,8 @@ void LinkedArray<T,C>::print() {
 }
 
 int main() {
-	LinkedArray<int, ASC<int>> l1;
+	LinkedArray<int, DESC<int>> l1;
+	LinkedArray<int, ASC<int>> l2;
 	int arr[13] = { 3,2,11,6,4,5,7,8,10,9,1,13,12 };
 	int del_arr[5] = { 1,13,6,4,10 };
 
@@ -196,4 +197,13 @@ int main() {
 		l1.print();
 	}
 
+	for (int i = 25; i > 0; i--) {
+		l2.add(i);
+	}
+	l2.print();
+
+	for (int i = 10; i > 2; i--) {
+		l2.del(i);
+		l2.print();
+	}
 }
