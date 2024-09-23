@@ -69,7 +69,7 @@ void CVector::pop_front() {
 }
 
 int& CVector::operator[](int v) {
-	if (v > elementos) {
+	if (v >= elementos) {
 		cout << "out of range" << endl;
 		int direccion_random = 0;
 		return direccion_random;
