@@ -196,7 +196,7 @@ void Deque::print() {
 }
 
 int& Deque::operator[](int v) {
-	if (v > elementos) {
+	if (v >= elementos) {
 		int random = 0;
 		return random;
 	}
