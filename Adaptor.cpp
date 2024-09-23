@@ -1,90 +1,6 @@
 #include <iostream>
 using namespace std;
 
-class CVector {
-public:
-	int tam = 5;
-	void push_back(int v);
-	void push_front(int v);
-	void pop_back();
-	void pop_front();
-	int& operator[](int v);
-	void print();
-private:
-	int elementos = 0;
-	int* arr = new int[tam];
-	void ExpandOrColapse(int newtam);
-};
-
-
-void CVector::ExpandOrColapse(int newtam) {
-	int* arrnew = new int[newtam];
-	for (int i = 0; i < tam; i++) {
-		arrnew[i] = arr[i];
-	}
-	tam = newtam;
-	int* temp = arr;
-	arr = arrnew;
-	delete temp;
-}
-
-
-
-void CVector::push_back(int v) {
-	if (elementos == tam) {
-		ExpandOrColapse(tam * 2);
-	}
-	arr[elementos] = v;
-	elementos++;
-}
-
-void CVector::push_front(int v) {
-	if (elementos == tam) {
-		ExpandOrColapse(tam * 2);
-	}
-	for (int i = elementos; i > 0; i--) {
-		arr[i] = arr[i - 1];
-	}
-	arr[0] = v;
-	elementos++;
-}
-
-void CVector::pop_back() {
-	if (elementos == tam / 2) {
-		ExpandOrColapse(tam / 2);
-	}
-	elementos--;
-}
-
-void CVector::pop_front() {
-	if (elementos == tam / 2) {
-		ExpandOrColapse(tam / 2);
-	}
-	for (int i = 0; i < elementos; i++) {
-		arr[i] = arr[i + 1];
-	}
-	elementos--;
-
-}
-
-int& CVector::operator[](int v) {
-	if (v > elementos) {
-		cout << "out of range" << endl;
-		int direccion_random = 0;
-		return direccion_random;
-	}
-	else {
-		return arr[v];
-	}
-}
-
-void CVector::print() {
-	for (int i = 0; i < elementos; i++) {
-		cout << arr[i] << " ";
-	}
-	cout << endl;
-}
-
 struct node {
 	int valor;
 	node* next;
@@ -187,10 +103,95 @@ void CList::print() {
 	cout << endl;
 }
 
+class CVector {
+public:
+	int tam;
+	CVector(int t) : tam(t) {}
+	void push_back(int v);
+	void push_front(int v);
+	void pop_back();
+	void pop_front();
+	int& operator[](int v);
+	void print();
+private:
+	int elementos = 0;
+	int* arr = new int[tam];
+	void ExpandOrColapse(int newtam);
+};
+
+
+void CVector::ExpandOrColapse(int newtam) {
+	int* arrnew = new int[newtam];
+	for (int i = 0; i < tam; i++) {
+		arrnew[i] = arr[i];
+	}
+	tam = newtam;
+	int* temp = arr;
+	arr = arrnew;
+	delete temp;
+}
+
+
+
+void CVector::push_back(int v) {
+	if (elementos == tam) {
+		ExpandOrColapse(tam * 2);
+	}
+	arr[elementos] = v;
+	elementos++;
+}
+
+void CVector::push_front(int v) {
+	if (elementos == tam) {
+		ExpandOrColapse(tam * 2);
+	}
+	for (int i = elementos; i > 0; i--) {
+		arr[i] = arr[i - 1];
+	}
+	arr[0] = v;
+	elementos++;
+}
+
+void CVector::pop_back() {
+	if (elementos == tam / 2) {
+		ExpandOrColapse(tam / 2);
+	}
+	elementos--;
+}
+
+void CVector::pop_front() {
+	if (elementos == tam / 2) {
+		ExpandOrColapse(tam / 2);
+	}
+	for (int i = 0; i < elementos; i++) {
+		arr[i] = arr[i + 1];
+	}
+	elementos--;
+
+}
+
+int& CVector::operator[](int v) {
+	if (v >= elementos) {
+		cout << "out of range" << endl;
+		int direccion_random = 0;
+		return direccion_random;
+	}
+	else {
+		return arr[v];
+	}
+}
+
+void CVector::print() {
+	for (int i = 0; i < elementos; i++) {
+		cout << arr[i] << " ";
+	}
+	cout << endl;
+}
+
 class Deque {
 private:
-	int map_tam = 3;
-	int arr_tam = 5;
+	int map_tam;
+	int arr_tam;
 	int** map = new int* [map_tam];
 	int** inicio_mapa = map + (map_tam / 2);
 	int** fin_mapa = map + (map_tam / 2);
@@ -206,6 +207,7 @@ public:
 	void pop_front();
 	int& operator[](int v);
 	void print();
+	Deque(int m_t, int a_t) : map_tam(m_t), arr_tam(a_t) {}
 
 };
 
@@ -381,7 +383,7 @@ void Deque::print() {
 }
 
 int& Deque::operator[](int v) {
-	if (v > elementos) {
+	if (v >= elementos) {
 		int random = 0;
 		return random;
 	}
@@ -395,49 +397,60 @@ int& Deque::operator[](int v) {
 }
 
 
-template<class K>
+template <class K>
 struct CStack {
-	K ctnr;
-	void push(int val) {
-		ctnr.push_back(val);
+	K c;
+	CStack(int tam) : c(tam) {}
+	CStack(int map_tam, int arr_tam) : c(map_tam, arr_tam) {}
+	void push(int v) {
+		c.push_back(v);
 	}
+
 	void pop() {
-		ctnr.pop_back();
+		c.pop_back();
 	}
+
 	void print() {
-		ctnr.print();
+		c.print();
 	}
 };
 
-template<class K>
+
+template <class K>
 struct CQueue {
-	K ctnr;
-	void push(int val) {
-		ctnr.push_back(val);
+	K c;
+	CQueue(int tam) : c(tam) {}
+	CQueue(int map_tam, int arr_tam) : c(map_tam, arr_tam) {}
+	void push(int v) {
+		c.push_back(v);
 	}
+
 	void pop() {
-		ctnr.pop_front();
+		c.pop_front();
 	}
+
 	void print() {
-		ctnr.print();
+		c.print();
 	}
 };
+
+
 
 int main() {
-	CStack<CVector> d;
-	d.push(3);
-	d.push(2);
-	d.push(1);
-	d.push(5);
-	d.push(4);
-	d.print();
+	CStack<CVector> a(5);
+	a.push(3);
+	a.push(2);
+	a.push(1);
+	a.push(4);
+	a.push(5);
+	a.print();
 
-	CQueue<Deque> d2;
-	d2.push(3);
-	d2.push(2);
-	d2.push(1);
-	d2.push(5);
-	d2.push(4);
-	d2.print();
+	CQueue<Deque> b(3,5);
+	b.push(3);
+	b.push(2);
+	b.push(1);
+	b.push(4);
+	b.push(5);
+	b.print();
 
 }
