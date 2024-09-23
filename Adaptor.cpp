@@ -413,7 +413,7 @@ template<class K>
 struct CQueue {
 	K ctnr;
 	void push(int val) {
-		ctnr.push_front(val);
+		ctnr.push_back(val);
 	}
 	void pop() {
 		ctnr.pop_front();
