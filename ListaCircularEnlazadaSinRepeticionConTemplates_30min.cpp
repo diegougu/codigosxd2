@@ -17,44 +17,40 @@ struct DESC {
 
 template <class T>
 struct node {
-	T data;
-	node<T>* next;
-	node(T d, node<T>* n = nullptr) : data(d), next(n) {}
+	T valor;
+	node<T>* next = nullptr;
+	node(T v, node<T>* n = nullptr) : valor(v), next(n) {}
 };
 
 template <class T, class C>
 class CircularLinkedList {
 private:
 	node<T>* head = nullptr;
-	bool find(node<T>*& pos, T v);
+	bool find(T v, node<T>*& p);
 public:
 	void add(T v);
 	void del(T v);
 	void print();
 };
 
-
 template <class T, class C>
-bool CircularLinkedList<T, C>::find(node<T>*& pos, T v) {
+bool CircularLinkedList<T, C>::find(T v, node<T>*& p) {
 	C comp;
-	node<T>* p = head;
+	node<T>* q = head;
 	do {
-		p = pos;
-		pos = pos->next;
-	} while (pos->next != head && comp(v, pos->data));
+		q = p;
+		p = p->next;
+	} while (p->next != head && comp(v, p->valor));
 
-	if (pos->data == v) {
-		pos = p;
+	if (p->valor == v) {
+		p = q;
 		return true;
 	}
 	else {
-		pos = p;
+		p = q;
 		return false;
 	}
-
-
 }
-
 
 template <class T, class C>
 void CircularLinkedList<T, C>::add(T v) {
@@ -64,67 +60,66 @@ void CircularLinkedList<T, C>::add(T v) {
 		head = temp;
 		head->next = head;
 	}
-	else if (v != head->data && !comp(v, head->data)) {
-		node<T>* ult = head;
-		do {
-			ult = ult->next;
-		} while (ult->next != head);
+	else if (!comp(v, head->valor) && v != head->valor) {
 		node<T>* temp = new node<T>(v);
+		node<T>* p = head;
+		do {
+			p = p->next;
+		} while (p->next != head);
+		
 		temp->next = head;
 		head = temp;
-		ult->next = head;
+		p->next = head;
 	}
 	else {
-		node<T>* pos = head;
-		if (find(pos, v)) {
+		node<T>* p = head;
+		if (find(v, p)) {
 			return;
 		}
 		node<T>* temp = new node<T>(v);
-		node<T>* p = pos->next;
-		if (p->next == head && comp(v, p->data)) {
-			p->next = temp;
+		node<T>* q = p->next;
+
+		if (comp(v, q->valor) && q->next == head) {
+			q->next = temp;
 			temp->next = head;
 		}
 		else {
-			pos->next = temp;
-			temp->next = p;
+			p->next = temp;
+			temp->next = q;
 		}
-
 	}
 }
+
 
 template <class T, class C>
 void CircularLinkedList<T, C>::del(T v) {
 	if (head == nullptr) {
 		return;
 	}
-	else if (v == head->data && head->next != head) {
+	else if (head->valor == v) {
 		node<T>* temp = head;
-		node<T>* ult = head;
-		do {
-			ult = ult->next;
-		} while (ult->next != head);
-		head = head->next;
-		ult->next = head;
-		delete temp;
-	}
-	else {
-		node<T>* pos = head;
-		if (!find(pos, v)) {
-			return;
-		}
-		node<T>* temp = pos->next;
-		if (temp->next == head) {
-			pos->next = head;
+		if (head->next == head) {
+			head = nullptr;
 			delete temp;
 		}
 		else {
-			pos->next = temp->next;
+			node<T>* p = head;
+			do {
+				p = p->next;
+			} while (p->next != head);
+			head = head->next;
+			p->next = head;
 			delete temp;
-
 		}
-
-
+	}
+	else {
+		node<T>* p = head;
+		if (!find(v, p)) {
+			return;
+		}
+		node<T>* temp = p->next;
+		p->next = temp->next;
+		delete temp;
 	}
 }
 
@@ -132,12 +127,10 @@ template <class T, class C>
 void CircularLinkedList<T, C>::print() {
 	node<T>* p = head;
 	do {
-		cout << p->data << " ";
+		cout << p->valor << " ";
 		p = p->next;
 	} while (p != head);
-
 	cout << endl;
-
 }
 
 
