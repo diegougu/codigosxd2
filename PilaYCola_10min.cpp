@@ -79,13 +79,6 @@ bool Cola<T>::pop(T& v) {
 	if (head == nullptr) {
 		return false;
 	}
-	else if (head->next == nullptr) {
-		v = head->valor;
-		node<T>* temp = head;
-		delete temp;
-		head = nullptr;
-		tail = nullptr;
-	}
 	else {
 		v = head->valor;
 		node<T>* temp = head;
