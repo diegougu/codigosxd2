@@ -1,4 +1,4 @@
-#include <iostream>	
+#include <iostream>
 using namespace std;
 
 template <class T>
@@ -15,31 +15,28 @@ private:
 	arrnode<T>* head = nullptr;
 	arrnode<T>* tail = nullptr;
 public:
-	void add(T v);
+	void push(T v);
 	bool pop(T& v);
 	void print();
 };
 
-
 template <class T>
-void ColaArray<T>::add(T v) {
+void ColaArray<T>::push(T v) {
 	if (head == nullptr) {
 		arrnode<T>* temp = new arrnode<T>;
 		head = temp;
 		tail = temp;
 		*tail->top = v;
 	}
+	else if (tail->top == tail->arr + tail->tam - 1) {
+		arrnode<T>* temp = new arrnode<T>;
+		tail->next = temp;
+		tail = tail->next;
+		*tail->top = v;
+	}
 	else {
-		if (tail->top != tail->arr + tail->tam - 1) {
-			tail->top++;
-			*tail->top = v;
-		}
-		else {
-			arrnode<T>* temp = new arrnode<T>;
-			tail->next = temp;
-			tail = tail->next;
-			*tail->top = v;
-		}
+		tail->top++;
+		*tail->top = v;
 	}
 }
 
@@ -47,6 +44,14 @@ template <class T>
 bool ColaArray<T>::pop(T& v) {
 	if (head == nullptr) {
 		return false;
+	}
+	else if (head == tail && tail->top == tail->arr) {
+		v = *head->arr;
+		arrnode<T>* temp = head;
+		head = nullptr;
+		tail = nullptr;
+		delete temp;
+		return true;
 	}
 	else {
 		v = *head->arr;
@@ -64,7 +69,6 @@ bool ColaArray<T>::pop(T& v) {
 				pa++;
 			}
 			p = p->next;
-
 			if (p != nullptr) {
 				pa = p->arr;
 			}
@@ -72,6 +76,7 @@ bool ColaArray<T>::pop(T& v) {
 
 		if (tail->top != tail->arr) {
 			tail->top--;
+			return true;
 		}
 		else {
 			arrnode<T>* temp = head;
@@ -82,7 +87,9 @@ bool ColaArray<T>::pop(T& v) {
 			temp = temp->next;
 			tail->next = nullptr;
 			delete temp;
+			return true;
 		}
+
 	}
 }
 
@@ -101,7 +108,7 @@ void ColaArray<T>::print() {
 int main() {
 	ColaArray<int> c;
 	for (int i = 0; i <= 27; i++) {
-		c.add(i);
+		c.push(i);
 		c.print();
 	}
 
