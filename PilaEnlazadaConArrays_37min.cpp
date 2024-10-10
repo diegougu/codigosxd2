@@ -3,7 +3,8 @@ using namespace std;
 
 template <class T>
 struct arrnode {
-	T arr[5];
+	const static int tam = 5;
+	T arr[tam];
 	T* top = arr;
 	arrnode<T>* next = nullptr;
 };
@@ -28,15 +29,16 @@ void PilaArray<T>::push(T v) {
 	else {
 		arrnode<T>* p = head;
 		T* pa = p->arr;
-		T temp = *pa;
+
+		T temp1 = *pa;
 		T temp2 = *pa;
 		*pa = v;
 		pa++;
 		while (p != nullptr) {
 			while (pa <= p->top) {
-				temp2 = *pa;
-				*pa = temp;
-				temp = temp2;
+				temp1 = *pa;
+				*pa = temp2;
+				temp2 = temp1;
 				pa++;
 			}
 			p = p->next;
@@ -44,21 +46,20 @@ void PilaArray<T>::push(T v) {
 				pa = p->arr;
 			}
 		}
-
 		arrnode<T>* u = head;
 		while (u->next != nullptr) {
 			u = u->next;
 		}
 
-		if (u->top != u->arr + 4) {
+		if (u->top != u->arr + u->tam - 1) {
 			u->top++;
-			*u->top = temp;
+			*u->top = temp1;
 		}
 		else {
-			arrnode<T>* t = new arrnode<T>;
-			u->next = t;
+			arrnode<T>* temp = new arrnode<T>;
+			u->next = temp;
 			u = u->next;
-			*u->top = temp;
+			*u->top = temp1;
 		}
 	}
 }
@@ -68,15 +69,22 @@ bool PilaArray<T>::pop(T& v) {
 	if (head == nullptr) {
 		return false;
 	}
+	else if (head->next == nullptr && head->top == head->arr) {
+		arrnode<T>* temp = head;
+		v = *head->top;
+		head = nullptr;
+		delete temp;
+		return true;
+	}
 	else {
 		v = *head->arr;
 		arrnode<T>* p = head;
-		T* pa = p->arr;
+		T* pa = head->arr;
+
 		while (p != nullptr) {
 			while (pa <= p->top) {
 				if (pa == p->top && p->next != nullptr) {
 					*pa = *p->next->arr;
-
 				}
 				else {
 					*pa = *(pa + 1);
@@ -88,21 +96,21 @@ bool PilaArray<T>::pop(T& v) {
 				pa = p->arr;
 			}
 		}
-
-		arrnode<T>* u = head;
-		arrnode<T>* up = head;
-
-		while (u->next != nullptr) {
-			up = u;
-			u = u->next;
+		arrnode<T>* temp = head;
+		arrnode<T>* prev = head;
+		while (temp->next != nullptr) {
+			prev = temp;
+			temp = temp->next;
 		}
 
-		if (u->top != u->arr) {
-			u->top--;
+		if (temp->top == temp->arr) {
+			prev->next = nullptr;
+			delete temp;
+			return true;
 		}
 		else {
-			up->next = nullptr;
-			delete u;
+			temp->top--;
+			return true;
 		}
 	}
 }
