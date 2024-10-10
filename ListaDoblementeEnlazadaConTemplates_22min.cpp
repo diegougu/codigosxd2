@@ -34,15 +34,14 @@ public:
 	void print();
 };
 
-
-
 template <class T, class C>
 bool DoubleLinkedList<T, C>::find(node<T>*& pos, T v) {
 	C comp;
 	while (pos->next != nullptr && comp(v, pos->data)) {
 		pos = pos->next;
 	}
-	return pos->data == v && pos != nullptr;
+
+	return pos->data == v;
 }
 
 
@@ -53,7 +52,7 @@ void DoubleLinkedList<T, C>::add(T v) {
 		node<T>* temp = new node<T>(v);
 		head = temp;
 	}
-	else if (v != head->data && !comp(v, head->data)) {
+	else if (!comp(v, head->data) && v != head->data) {
 		node<T>* temp = new node<T>(v);
 		temp->next = head;
 		head->prev = temp;
@@ -65,16 +64,16 @@ void DoubleLinkedList<T, C>::add(T v) {
 			return;
 		}
 		node<T>* temp = new node<T>(v);
-		if (pos->next == nullptr && comp(v, pos->data)) {
+		if (comp(v, pos->data) && pos->next == nullptr) {
 			pos->next = temp;
 			temp->prev = pos;
 		}
 		else {
-			node<T>* p = pos->prev;
-			p->next = temp;
-			temp->prev = p;
-			temp->next = pos;
+			node<T>* temp = new node<T>(v);
+			temp->prev = pos->prev;
+			pos->prev->next = temp;
 			pos->prev = temp;
+			temp->next = pos;
 		}
 	}
 }
@@ -84,35 +83,40 @@ void DoubleLinkedList<T, C>::del(T v) {
 	if (head == nullptr) {
 		return;
 	}
-	else if (v == head->data && head->next != nullptr) {
+	else if (v == head->data) {
 		node<T>* temp = head;
-		head = head->next;
-		head->prev = nullptr;
-		delete temp;
-	}
-	else if (v == head->data && head->next == nullptr) {
-		node<T>* temp = head;
-		head = nullptr;
-		delete temp;
-	}
-	else {
-		node<T>* temp = head;
-		if (!find(temp, v)) {
-			return;
-		}
-		node<T>* p = temp->prev;
-		
-		if (temp->next == nullptr) {
-			p->next = temp->next;
+		if (head->next == nullptr) {
+			head = nullptr;
 			delete temp;
 		}
 		else {
-			p->next = temp->next;
-			temp->next->prev = p;
+			head = head->next;
+			head->prev = nullptr;
+			delete temp;
+		}
+	}
+	else {
+		node<T>* pos = head;
+		if (!find(pos, v)) {
+			return;
+		}
+
+		node<T>* temp = pos;
+		pos = pos->prev;
+
+		if (temp->next == nullptr) {
+			pos->next = temp->next;
+			delete temp;
+		}
+		else {
+			pos->next = temp->next;
+			temp->next->prev = pos;
 			delete temp;
 		}
 	}
 }
+
+
 
 template <class T, class C>
 void DoubleLinkedList<T, C>::print() {
@@ -122,10 +126,9 @@ void DoubleLinkedList<T, C>::print() {
 	cout << endl;
 }
 
-
 int main() {
-	cout << "Lista de enteros (DESC):" << endl;
-	DoubleLinkedList<int, DESC<int>> listaIntDesc;
+	cout << "Lista de enteros (ASC):" << endl;
+	DoubleLinkedList<int, ASC<int>> listaIntDesc;
 	listaIntDesc.add(3);
 	listaIntDesc.add(1);
 	listaIntDesc.add(7);
@@ -141,6 +144,5 @@ int main() {
 	listaIntDesc.del(5);
 	listaIntDesc.del(3);
 	listaIntDesc.print();
-
 
 }
