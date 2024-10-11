@@ -34,17 +34,25 @@ public:
 	void print();
 };
 
+template <class T, class C>
+void CircularDoubleLinkedList<T, C>::print() {
+	node<T>* p = head;
+	do {
+		cout << p->data << " ";
+		p = p->next;
+	} while (p != head);
+	cout << endl;
+}
 
 template <class T, class C>
 bool CircularDoubleLinkedList<T, C>::find(node<T>*& pos, T v) {
 	C comp;
 	do {
 		pos = pos->next;
-	} while (pos->next != head && comp(v, pos->data));
+	} while (comp(v, pos->data) && pos->next != head);
 
 	return pos->data == v;
 }
-
 
 
 
@@ -57,13 +65,14 @@ void CircularDoubleLinkedList<T, C>::add(T v) {
 		head->next = head;
 		head->prev = head;
 	}
-	else if (v != head->data && !comp(v, head->data)) {
-		node<T>* ult = head->prev;
+	else if (!comp(v, head->data) && head->data != v) {
 		node<T>* temp = new node<T>(v);
+		node<T>* u = head->prev;
 		temp->next = head;
+		temp->prev = u;
 		head->prev = temp;
+		u->next = temp;
 		head = temp;
-		ult->next = head;
 	}
 	else {
 		node<T>* pos = head;
@@ -72,79 +81,61 @@ void CircularDoubleLinkedList<T, C>::add(T v) {
 		}
 		node<T>* temp = new node<T>(v);
 		if (pos->next == head && comp(v, pos->data)) {
+			temp->next = head;
+			head->prev = temp;
 			pos->next = temp;
 			temp->prev = pos;
-			temp->next = head;
-			pos->prev = temp;
 		}
 		else {
-			node<T>* p = pos->prev;
-			p->next = temp;
-			temp->prev = p;
+			node<T>* ant = pos->prev;
 			temp->next = pos;
+			ant->next = temp;
+			temp->prev = ant;
 			pos->prev = temp;
 		}
-
 	}
 }
 
 
 template <class T, class C>
 void CircularDoubleLinkedList<T, C>::del(T v) {
+	C comp;
 	if (head == nullptr) {
 		return;
 	}
-	else if (head->data == v && head->next == head) {
+	else if (v == head->data) {
 		node<T>* temp = head;
-		head = nullptr;
-		delete temp;
-	}
-	else if (head->data == v && head->next != head) {
-		node<T>* temp = head;
-		node<T>* ult = head->prev;
-		head = head->next;
-		head->prev = ult;
-		ult->next = head;
-		delete temp;
+		if (head->next == head) {
+			head = nullptr;
+			delete temp;
+		}
+		else {
+			node<T>* u = head->prev;
+			head = head->next;
+			head->prev = u;
+			u->next = head;
+			delete temp;
+		}
 	}
 	else {
 		node<T>* temp = head;
 		if (!find(temp, v)) {
 			return;
 		}
-		node<T>* p = temp->prev;
 
-		if (temp->next == head) {
-			p->next = head;
-			head->prev = p;
-			delete temp;
-		}
-		else {
-			p->next = temp->next;
-			temp->next->prev = p;
-			delete temp;
-		}
+		node<T>* ant = temp->prev;
+		node<T>* pos = temp->next;
 
-
+		pos->prev = ant;
+		ant->next = pos;
+		delete temp;
 	}
 }
-
-template <class T, class C>
-void CircularDoubleLinkedList<T, C>::print() {
-	node<T>* p = head;
-	do {
-		cout << p->data << " ";
-		p = p->next;
-	} while (p != head);
-	cout << endl;
-}
-
-
 
 
 int main() {
 	cout << "Lista de enteros (DESC):" << endl;
-	CircularDoubleLinkedList<int, DESC<int>> listaIntDesc;
+	CircularDoubleLinkedList<int, ASC<int>> listaIntDesc;
 	listaIntDesc.add(3);
 	listaIntDesc.add(1);
 	listaIntDesc.add(7);
@@ -162,5 +153,3 @@ int main() {
 
 
 }
-
-
