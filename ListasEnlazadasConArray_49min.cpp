@@ -17,7 +17,8 @@ struct DESC {
 
 template <class T>
 struct arrnode {
-	T arr[5];
+	const static int tam = 5;
+	T arr[tam];
 	T* top = arr;
 	arrnode<T>* next = nullptr;
 };
@@ -52,7 +53,6 @@ bool LinkedArray<T, C>::find(arrnode<T>*& pos, T*& pos_arr, T v) {
 	return false;
 }
 
-
 template <class T, class C>
 void LinkedArray<T, C>::add(T v) {
 	C comp;
@@ -62,11 +62,11 @@ void LinkedArray<T, C>::add(T v) {
 		tail = temp;
 		*tail->top = v;
 	}
-	else if (comp(v, *tail->top) && tail->top != tail->arr + 4) {
+	else if (comp(v, *tail->top) && tail->top != tail->arr + tail->tam - 1) {
 		tail->top++;
 		*tail->top = v;
 	}
-	else if (comp(v, *tail->top) && tail->top == tail->arr + 4) {
+	else if (comp(v, *tail->top) && tail->top == tail->arr + tail->tam - 1) {
 		arrnode<T>* temp = new arrnode<T>;
 		tail->next = temp;
 		tail = tail->next;
@@ -75,38 +75,36 @@ void LinkedArray<T, C>::add(T v) {
 	else {
 		arrnode<T>* pos = head;
 		T* pos_arr = pos->arr;
-
 		if (find(pos, pos_arr, v)) {
 			T temp1 = *pos_arr;
+			T temp2 = *pos_arr;
 			*pos_arr = v;
-			T temp2 = temp1;
 			pos_arr++;
 
 			while (pos != nullptr) {
 				while (pos_arr <= pos->top) {
-					temp2 = *pos_arr;
-					*pos_arr = temp1;
-					temp1 = temp2;
+					temp1 = *pos_arr;
+					*pos_arr = temp2;
+					temp2 = temp1;
 					pos_arr++;
 				}
-
 				pos = pos->next;
 				if (pos != nullptr) {
 					pos_arr = pos->arr;
 				}
 			}
-			if (tail->top != tail->arr + 4) {
-				tail->top++;
-				*tail->top = temp1;
-			}
-			else {
+
+			if (tail->top == tail->arr + tail->tam - 1) {
 				arrnode<T>* temp = new arrnode<T>;
 				tail->next = temp;
 				tail = tail->next;
 				*tail->top = temp1;
 			}
+			else {
+				tail->top++;
+				*tail->top = temp1;
+			}
 		}
-
 	}
 }
 
@@ -116,31 +114,36 @@ void LinkedArray<T, C>::del(T v) {
 	if (head == nullptr) {
 		return;
 	}
-	else if (*tail->top == v && tail->top != tail->arr) {
-		tail->top--;
+	else if (head == tail && tail->top == tail->arr) {
+		arrnode<T>* temp = head;
+		head = nullptr;
+		tail = nullptr;
+		delete temp;
 	}
-	else if (*tail->top == v && tail->top == tail->arr) {
-		arrnode<T>* temp = tail;
-		arrnode<T>* p = head;
-		while (p->next != tail) {
-			p = p->next;
+	else if (*tail->top == v && tail->top == tail->arr && head != tail) {
+		arrnode<T>* temp = head;
+		while (temp->next != tail) {
+			temp = temp->next;
 		}
-		tail = p;
+		tail = temp;
+		temp = temp->next;
 		tail->next = nullptr;
 		delete temp;
+	}
+	else if (*tail->top == v && tail->top != tail->arr) {
+		tail->top--;
 	}
 	else {
 		arrnode<T>* pos = head;
 		T* pos_arr = pos->arr;
-		if (find(pos, pos_arr, v) && *pos_arr == v) {
+		if (find(pos, pos_arr, v)) {
 			while (pos != nullptr) {
 				while (pos_arr <= pos->top) {
-					if (pos_arr != pos->top) {
-						*pos_arr = *(pos_arr + 1);
+					if (pos_arr == pos->top && pos->next != nullptr) {
+						*pos_arr = *pos->next->arr;
 					}
-					else if (pos_arr == pos->top && pos->next != nullptr) {
-						T* pos_next_arr = pos->next->arr;
-						*pos_arr = *pos_next_arr;
+					else {
+						*pos_arr = *(pos_arr + 1);
 					}
 					pos_arr++;
 				}
@@ -148,24 +151,22 @@ void LinkedArray<T, C>::del(T v) {
 				if (pos != nullptr) {
 					pos_arr = pos->arr;
 				}
-
 			}
+
 			if (tail->top != tail->arr) {
 				tail->top--;
 			}
-			else if (tail->top == tail->arr) {
-				arrnode<T>* temp = tail;
-				arrnode<T>* p = head;
-				while (p->next != tail) {
-					p = p->next;
+			else {
+				arrnode<T>* temp = head;
+				while (temp->next != tail && temp != nullptr) {
+					temp = temp->next;
 				}
-				tail = p;
+				tail = temp;
+				temp = temp->next;
 				tail->next = nullptr;
 				delete temp;
 			}
 		}
-
-
 	}
 }
 
