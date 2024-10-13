@@ -50,38 +50,43 @@ void LinkedList<T, C>::print() {
 
 template <class T, class C>
 void LinkedList<T, C>::sort() {
-	C comp;
-	if (head == nullptr || head->next == nullptr) {
+	if (head == nullptr) {
 		return;
 	}
-	node<T>* p = head;
-	while (p != nullptr) {
-		node<T>* q = p->next;
-		while (q != nullptr) {
-			if (comp(p->valor, q->valor) && p == head) {
-				node<T>* a = p;
-				while (a->next != q) {
-					a = a->next;
-				}
-				a->next = q->next;
-				q->next = p;
-				p = q;
-				head = p;
-			}
-			else if (comp(p->valor, q->valor) && p != head) {
-				node<T>* a = p;
-				node<T>* b = head;
-				while (a->next != q) {
-					a = a->next;
-				}
-				while (b->next != p) {
-					b = b->next;
-				}
-				b->next = q;
-				a->next = q->next;
-				q->next = p;
-				p = q;
 
+	if (head != nullptr && head->next == nullptr) {
+		return;
+	}
+
+	C comp;
+	node<T>* p = head;
+	node<T>* q = p;
+	while (p != nullptr) {
+		q = p->next;
+		while (q != nullptr) {
+			if (p == head && comp(p->valor, q->valor)) {
+				node<T>* s = head;
+				while (s->next != q) {
+					s = s->next;
+				}
+				s->next = q->next;
+				q->next = p;
+				head = q;
+				p = q;
+			}
+			else if (p != head && comp(p->valor, q->valor)){
+				node<T>* r = head;
+				while (r->next != p) {
+					r = r->next;
+				}
+				node<T>* s = head;
+				while (s->next != q) {
+					s = s->next;
+				}
+				r->next = q;
+				s->next = q->next;
+				q->next = p;
+				p = q;
 			}
 			q = q->next;
 		}
@@ -89,6 +94,7 @@ void LinkedList<T, C>::sort() {
 	}
 
 }
+
 
 
 int main() {
@@ -102,4 +108,3 @@ int main() {
 	l1.sort();
 	l1.print();
 }
-
