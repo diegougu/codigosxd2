@@ -1,7 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <algorithm>
-#include <vector>   
+#include <vector>
 using namespace std;
 
 
@@ -30,40 +30,40 @@ void ordenar(int* ini, int* fin) {
 
 void OrdenarThreading() {
     int n = thread::hardware_concurrency();
-    vector<thread> vec;
-    int* posicion = arr;
+    int* pos = arr;
     int suma = tam / n;
-    while (n >= 1) {
-        for (int i = 0; i <= n; i++) {
-            if (posicion < arr + tam) {
-                if (posicion + suma >= arr + tam && i == n) {
-                    vec.push_back(thread(ordenar, posicion, arr + tam - 1));
-                }
-                else {
-                    vec.push_back(thread(ordenar, posicion, posicion + suma));
-                }
-                posicion = posicion + suma;
+    vector<thread> t;
+    while (n > 0) {
+
+        for (int i = 0; i < n; i++) {
+
+            if (i != n) {
+                t.push_back(thread(ordenar, pos, pos + suma));
+                pos = pos + n;
+            }
+            else {
+                t.push_back(thread(ordenar, pos, arr + tam - 1));
             }
         }
 
-        for (int i = 0; i < vec.size(); i++) {
-            vec[i].join();
+
+        for (int i = 0; i < t.size(); i++) {
+            t[i].join();
         }
 
+        pos = arr;
+
         n = n / 2;
-        posicion = arr;
 
         if (n != 0) {
             suma = tam / n;
         }
 
-
-        vec.clear();
-
+        t.clear();
 
         print();
-    }
 
+    }
 }
 
 
@@ -73,10 +73,6 @@ int main() {
 
     OrdenarThreading();
 
+    print();
 
 }
-
-
-
-
-
