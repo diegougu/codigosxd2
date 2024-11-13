@@ -97,12 +97,22 @@ void CBinTree::color_bordes(sf::RenderWindow& window) {
     while (*p != nullptr || *q != nullptr) {
         if (*p != nullptr) {
             (*p)->color = 1;
-            p = &((*p)->nodes[0]);
+            if ((*p)->nodes[0] != nullptr) {
+                p = &((*p)->nodes[0]);
+            }
+            else {
+                p = &((*p)->nodes[1]);
+            }
         }
 
         if (*q != nullptr) {
             (*q)->color = 1;
-            q = &((*q)->nodes[1]);
+            if ((*q)->nodes[1] != nullptr) {
+                q = &((*q)->nodes[1]);
+            }
+            else {
+                q = &((*q)->nodes[0]);
+            }
         }
     }
     color_b(m_root, window, 400, 50, 200, 100);
@@ -129,19 +139,26 @@ bool CBinTree::Insert(int x)
 int main()
 {
     CBinTree t;
-    t.Insert(50);
-    t.Insert(30);
-    t.Insert(70);
-    t.Insert(28);
-    t.Insert(40);
-    t.Insert(25);
-    t.Insert(45);
-    t.Insert(43);
-    t.Insert(60);
     t.Insert(100);
-    t.Insert(65);
-    t.Insert(62);
-    t.Insert(90);
+    t.Insert(30);
+    t.Insert(200);
+    t.Insert(10);
+    t.Insert(40);
+    t.Insert(24);
+    t.Insert(20);
+    t.Insert(300);
+    t.Insert(250);
+    t.Insert(270);
+    t.Insert(70);
+    t.Insert(80);
+    t.Insert(150);
+    t.Insert(170);
+    t.Insert(120);
+
+
+
+
+
 
     sf::RenderWindow window(sf::VideoMode(800, 600), "Visualización del Árbol Binario");
 
