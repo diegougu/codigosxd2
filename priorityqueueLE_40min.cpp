@@ -20,7 +20,7 @@ struct node {
 	T data;
 	node<T>* next = nullptr;
 	node<T>* prev = nullptr;
-	node(T d, node<T>*n = nullptr, node<T>* p = nullptr) : data(d), next(n), prev(p) {}
+	node(T d, node<T>* n = nullptr, node<T>* p = nullptr) : data(d), next(n), prev(p) {}
 };
 
 template <class T, class C>
@@ -38,7 +38,7 @@ public:
 template <class T, class C>
 void PriorityQueueLE<T, C>::push(T v) {
 	node<T>* newnode = new node<T>(v);
-	C comp;
+	C comp; 
 	nodes_c++;
 	if (head == nullptr) {
 		head = newnode;
@@ -48,30 +48,28 @@ void PriorityQueueLE<T, C>::push(T v) {
 		tail->next = newnode;
 		newnode->prev = tail;
 		tail = tail->next;
-
-		node<T>* act = tail;
-		int subir = nodes_c - 1;
+		int pos = nodes_c - 1;
+		node<T>* pos_node = tail;
 		bool ch = true;
 
-		while (ch == true && act != nullptr) {
-			int t = subir;
-			if (t % 2 == 0) {
-				t = subir / 2 - 1;
+		while (pos_node != nullptr && ch == true) {
+			int dif = 0;
+			if (pos % 2 == 0) {
+				dif = pos / 2 - 1;
 			}
 			else {
-				t = subir / 2;
+				dif = pos / 2;
 			}
 
-			node<T>* p = act;
-			
-			for (int i = subir; i > t && p != nullptr; i--) {
-				p = p->prev;
+			node<T>* c_node = pos_node;
+			for (int k = dif; k < pos; k++) {
+				c_node = c_node->prev;
 			}
 
-			if (p != nullptr && act != nullptr && comp(act->data, p->data)) {
-				swap(p->data, act->data);
-				act = p;
-				subir = t;
+			if (c_node != nullptr && pos_node != nullptr && comp(pos_node->data, c_node->data)) {
+				swap(pos_node->data, c_node->data);
+				pos_node = c_node;
+				pos = dif;
 			}
 			else {
 				ch = false;
@@ -82,9 +80,7 @@ void PriorityQueueLE<T, C>::push(T v) {
 
 template <class T, class C>
 void PriorityQueueLE<T, C>::pop() {
-	C comp;
 	node<T>* temp = tail;
-	nodes_c--;
 	if (head == nullptr) {
 		return;
 	}
@@ -94,52 +90,56 @@ void PriorityQueueLE<T, C>::pop() {
 		delete temp;
 	}
 	else {
-		swap(head->data, tail->data);
+		C comp;
+		swap(tail->data, head->data);
 		tail = tail->prev;
 		tail->next = nullptr;
 		delete temp;
-
-		node<T>* act = head;
-		int bajar = 0;
+		int pos = 0;
+		node<T>* pos_node = head;
 		bool ch = true;
-		int der = 0;
-		int iz = 0;
-		while (der < nodes_c && iz < nodes_c && act != nullptr && ch == true) {
-			der = (bajar + 1) * 2;
-			iz = (bajar + 1) * 2 - 1;
+		while (pos_node != nullptr && pos < nodes_c && ch == true) {
+			int izquierda = (pos + 1) * 2 - 1;
+			int derecha = (pos + 1) * 2;
 
-			node<T>* p = act;
-			node<T>* q = act;
+			node<T>* iz_node = pos_node;
+			node<T>* der_node = pos_node;
 
-			for (int i = bajar ; i < der && p != nullptr; i++) {
-				p = p->next;
+
+			for (int k = pos; iz_node != nullptr && k < izquierda; k++) {
+				iz_node = iz_node->next;
 			}
 
-			for (int i = bajar; i < iz && p != nullptr; i++) {
-				q = q->next;
+			for (int k = pos; der_node != nullptr && k < derecha; k++) {
+				der_node = der_node->next;
 			}
 
-			if (p != nullptr && q != nullptr && comp(q->data, p->data)) {
-				if (act != nullptr && comp(q->data, act->data)) {
-					swap(q->data, act->data);
-					bajar = iz;
-					act = q;
+			if (iz_node != nullptr && der_node != nullptr && comp(iz_node->data, der_node->data)) {
+				if (comp(iz_node->data, pos_node->data)) {
+					swap(iz_node->data, pos_node->data);
+					pos = izquierda;
+					pos_node = iz_node;
 				}
 				else {
 					ch = false;
 				}
 			}
-			else if (p != nullptr && q != nullptr && comp(p->data, q->data)) {
-				if (act != nullptr && comp(p->data, act->data)) {
-					swap(p->data, act->data);
-					bajar = der;
-					act = p;
+			else if (iz_node != nullptr && der_node != nullptr && comp(der_node->data, iz_node->data)) {
+				if (comp(der_node->data, pos_node->data)) {
+					swap(der_node->data, pos_node->data);
+					pos = derecha;
+					pos_node = der_node;
 				}
 				else {
 					ch = false;
 				}
 			}
+			else {
+				ch = false;
+			}
+
 		}
+
 	}
 }
 
