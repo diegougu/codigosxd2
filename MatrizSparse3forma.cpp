@@ -38,6 +38,7 @@ public:
 	objx<T> operator()(int x, int y);
 	void set(int x, int y, T v);
 	T get(int x, int y);
+	void print();
 private:
 	bool find_bottom(node<T>**& pb, int x, int y);
 	bool find_right(node<T>**& pr, int x, int y);
@@ -145,6 +146,23 @@ T SparseMatrix<T>::get(int x, int y) {
 	}
 }
 
+template <class T>
+void SparseMatrix<T>::print() {
+	cout << "eje x" << endl;
+	for (int i = 0; i < tamx; i++) {
+		for (node<T>** p = &x_x[i]; *p; p = &((*p)->bottom)) {
+			cout << (*p)->valor << "( " << (*p)->x << " " << (*p)->y << " ) ";
+		}
+	}
+	cout << endl;
+	cout << "eje y" << endl;
+	for (int i = 0; i < tamy; i++) {
+		for (node<T>** p = &y_y[i]; *p; p = &((*p)->right)) {
+			cout << (*p)->valor << "( " << (*p)->x << " " << (*p)->y << " ) ";
+		}
+	}
+}
+
 template <class T >
 objx<T> SparseMatrix<T>::operator()(int x, int y) {
 	objx<T> ox(this);
@@ -152,6 +170,7 @@ objx<T> SparseMatrix<T>::operator()(int x, int y) {
 	ox.y = y;
 	return ox;
 }
+
 
 int main() {
 	SparseMatrix<int> m(4, 4);
@@ -204,7 +223,8 @@ int main() {
 
 	m(0, 1) = m(3, 2);
 	cout << "------------------------------" << endl;
-	cout << (int)m(3, 2) << endl;
+	cout << (int)m(0, 1) << endl;
 
+	m.print();
 
 }
