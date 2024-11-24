@@ -14,34 +14,27 @@ int matriz[rows][cols] = {
     {13, 14, 15, 16}
 };
 
-
-void transM(int a, int b) {
-
+void trans(int a, int b) {
+    int* right = *(matriz + a) + b;
+    int* down = *(matriz + a) + b;
     int move_r = b;
     int move_d = a;
-
-    int* down = *(matriz + a) + move_r;
-    int* right = *(matriz + move_d) + b;
-
-
-    while (move_r < cols && move_d < rows) {
-        swap(*down, *right);
+    while (right < *(matriz + a) + cols) {
+        swap(*right, *down);
         move_r++;
         move_d++;
-        down = *(matriz + a) + move_r;
-        right = *(matriz + move_d) + b;
+        right = *(matriz + a) + move_r;
+        down = *(matriz + move_d) + b;
     }
 }
-
-
 
 void transpuesta() {
     vector<thread> t;
     for (int i = 0; i < 4; i++) {
-        t.push_back(thread(transM, i, i));
+        t.push_back(thread(trans, i, i));
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < t.size(); i++) {
         t[i].join();
     }
 }
@@ -54,7 +47,7 @@ void print() {
         cout << endl;
     }
     cout << endl;
- }
+}
 
 
 int main() {
