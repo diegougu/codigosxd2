@@ -183,9 +183,8 @@ void SparseMatrix<T>::transpuesta() {
 			}
 			else {
 				node<T>** comp = &x_x[(*current)->y];
-				node<T>** comp2 = &y_y[(*current)->y];
 				bool find_b = find_bottom(comp, (*current)->y, i);
-				if (find_b) {
+				if (find_b && (*comp)->x == (*current)->y && (*comp)->y == (*current)->x) {
 					if ((*comp)->cambio == false) {
 						swap((*current)->valor, (*comp)->valor);
 						(*comp)->cambio = true;
