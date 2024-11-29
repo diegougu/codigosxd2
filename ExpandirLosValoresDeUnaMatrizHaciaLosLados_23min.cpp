@@ -1,19 +1,24 @@
-#include <iostream>	
-#include <thread>
+#include <iostream>
 #include <queue>
 #include <vector>
+#include <thread>
+#include <mutex>
+
 using namespace std;
+
+mutex mt[10][10];
+bool visited[10][10] = { false };
 
 int m[10][10] =
 {
     {0,0,0,0,0,0,0,0,0,0,},
-    {0,0,0,0,0,1,0,0,0,0,},
-    {0,2,0,0,0,0,0,0,0,0,},
-    {0,0,0,0,0,0,0,3,0,0,},
+    {0,0,0,0,0,10,0,0,0,0,},
+    {0,30,0,0,0,0,0,0,0,0,},
+    {0,0,0,0,0,0,0,5,0,0,},
     {0,0,0,0,0,0,0,0,0,0,},
     {0,0,0,0,0,0,0,0,0,0,},
     {0,0,0,0,0,0,0,0,0,0,},
-    {0,0,0,0,4,0,0,0,0,0,},
+    {0,0,0,0,50,0,0,0,0,0,},
     {0,0,0,0,0,0,0,0,0,0,},
     {0,0,0,0,0,0,0,0,0,0,},
 };
@@ -27,60 +32,77 @@ void printm()
             if (m[j][i] == 0)
                 std::cout << "  ";
             else
-                std::cout << m[j][i];
+                std::cout << m[j][i] << " ";
         }
-        cout << "\n";
+        std::cout << "\n";
     }
-    cout << "---------------------------\n";
+    std::cout << "---------------------------\n";
 }
 
+void expandizder(int x, int y) {
+    queue<pair<int, int>> pos;
+    pos.push(make_pair(x, y));
+    visited[x][y] = true;
 
-void rem(int a, int b) {
-    queue<pair<int, int>> rec;
-    int valor = m[a][b];
-    rec.push(make_pair(a, b));
-
-    while (!rec.empty()) {
-        pair<int, int> act = rec.front();
-
-        m[act.first][act.second] = valor;
-
-
-        if (act.second + 1 < 10 && m[act.first][act.second + 1] == 0) {
-            rec.push(make_pair(act.first, act.second + 1));
+    while (!pos.empty()) {
+        pair<int, int> current = pos.front();
+        pos.pop();
+        int valor = m[current.first][current.second];
+        vector<pair<int, int>> newpos;
+        if (current.second == 9) {
+            newpos.push_back(make_pair(current.first + 1, 0));
         }
-        else if (act.second + 1 == 10 && act.first + 1 < 10 && m[act.first + 1][0] == 0) {
-            rec.push(make_pair(act.first + 1, 0));
+        else {
+            newpos.push_back(make_pair(current.first, current.second + 1));
         }
-        
-        if (act.second - 1 >= 0 && m[act.first][act.second - 1] == 0) {
-            rec.push(make_pair(act.first, act.second - 1));
+        if (current.second == 0) {
+            newpos.push_back(make_pair(current.first - 1, 9));
         }
-        else if (act.second - 1 < 0 && act.first - 1 >= 0 && m[act.first - 1][9] == 0) {
-            rec.push(make_pair(act.first - 1, 9));
-
+        else {
+            newpos.push_back(make_pair(current.first, current.second - 1));
         }
 
-        rec.pop();
+        for (int i = 0; i < newpos.size(); i++) {
+            int xm = newpos[i].first;
+            int ym = newpos[i].second;
 
+            if (xm >= 0 && xm < 10 && ym >= 0 && ym < 10) {
+                mt[xm][ym].lock();
+                if (m[xm][ym] == 0 && visited[xm][ym] == false) {
+                    int* pointer = *m + (xm + ym);
+                    int* pointeract = *m + (current.first + current.second);
+                    if (pointer < pointeract) {
+                        m[xm][ym] = valor - 1;
+                    }
+                    else {
+                        m[xm][ym] = valor + 1;
+                    }
+                    visited[xm][ym] = true;
+                    pos.push(make_pair(xm, ym));
+                }
+                mt[xm][ym].unlock();
+            }
+        }
     }
 }
 
 
-void sides() {
-    thread T1(rem, 1, 5), T2(rem, 2, 1), T3(rem, 3, 7), T4(rem, 7, 4);
-    T1.join();
-    T2.join();
-    T3.join();
-    T4.join();
+void levels()
+{
+    vector<thread> vec;
+    vec.push_back(thread(expandizder, 1, 5));
+    vec.push_back(thread(expandizder, 2, 1));
+    vec.push_back(thread(expandizder, 3, 7));
+    vec.push_back(thread(expandizder, 7, 4));
 
-
+    for (int i = 0; i < vec.size(); i++) {
+        vec[i].join();
+    }
 }
 
-
-
-int main() {
+int main()
+{
     printm();
-    sides();
+    levels();
     printm();
 }
