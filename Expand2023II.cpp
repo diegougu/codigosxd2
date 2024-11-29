@@ -1,11 +1,12 @@
 #include <iostream>
 #include <thread>
-#include <mutex>
 #include <queue>
+#include <mutex>
 
 using namespace std;
 
 mutex mt[10][10];
+bool visited[10][10] = { 0 };
 
 int m[10][10] =
 {
@@ -37,47 +38,39 @@ void printm()
     std::cout << "---------------------------\n";
 }
 
-
 void expand(int x, int y) {
-    queue<pair<int, int>> pos;
-    pos.push(make_pair(x, y));
-    while (!pos.empty()) {
-        pair<int, int> act = pos.front();
+    queue<pair<int, int>> rec;
+    visited[x][y] = true;
+    rec.push(make_pair(x, y));
+    
+    while (!rec.empty()) {
+        pair<int, int> current = rec.front();
+        rec.pop();
+        int valor = m[current.first][current.second];
+        vector<pair<int, int>> newpos;
+        newpos.push_back(make_pair(current.first + 1, current.second));
+        newpos.push_back(make_pair(current.first - 1, current.second));
+        newpos.push_back(make_pair(current.first, current.second + 1));
+        newpos.push_back(make_pair(current.first, current.second - 1));
 
-        if (act.first - 1 >= 0 && act.second >= 0 && m[act.first - 1][act.second] == 0) {
-            pos.push(make_pair(act.first - 1, act.second));
-            mt[act.first - 1][act.second].lock();
-            int valor = m[act.first][act.second];
-            m[act.first - 1][act.second] = valor + 1;
-            mt[act.first - 1][act.second].unlock();
+        for (int i = 0; i < newpos.size(); i++) {
+            int nx = newpos[i].first;
+            int ny = newpos[i].second;
+
+            if (nx >= 0 && nx < 10 && ny >= 0 && ny < 10) {
+                mt[nx][ny].lock();
+                if (m[nx][ny] == 0 && visited[nx][ny] == false) {
+                    m[nx][ny] = valor + 1;
+                    visited[nx][ny] = true;
+                    rec.push(make_pair(nx, ny));
+                }
+                mt[nx][ny].unlock();
+            }
         }
 
-        if (act.first >= 0 && act.second - 1 >= 0 && m[act.first][act.second - 1] == 0) {
-            pos.push(make_pair(act.first, act.second - 1));
-            mt[act.first][act.second - 1].lock();
-            int valor = m[act.first][act.second];
-            m[act.first][act.second - 1] = valor + 1;
-            mt[act.first][act.second - 1].unlock();
-        }
-
-        if (act.first >= 0 && act.second + 1 <= 9 && m[act.first][act.second + 1] == 0) {
-            pos.push(make_pair(act.first, act.second + 1));
-            mt[act.first][act.second + 1].lock();
-            int valor = m[act.first][act.second];
-            m[act.first][act.second + 1] = valor + 1;
-            mt[act.first][act.second + 1].unlock();
-        }
-
-        if (act.first + 1 <= 9 && act.second >= 0 && m[act.first + 1][act.second] == 0) {
-            pos.push(make_pair(act.first + 1, act.second));
-            mt[act.first + 1][act.second].lock();
-            int valor = m[act.first][act.second];
-            m[act.first + 1][act.second] = valor + 1;
-            mt[act.first + 1][act.second].unlock();
-        }
-        pos.pop();
     }
 }
+
 
 void levels()
 {
@@ -91,15 +84,8 @@ void levels()
         vec[i].join();
     }
 
-}
 
-int main()
-{
-    printm();
-    levels();
-    printm();
 }
-
 
 int main()
 {
