@@ -43,8 +43,8 @@ void printm()
 
 void search() {
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> min;
-    min.push({ 13, 11 });
-    nt[13][11] = true;
+    min.push({ 13, 9 });
+    nt[13][9] = true;
     while (!min.empty()) {
         pair<int, int> pos = min.top();
         min.pop();
